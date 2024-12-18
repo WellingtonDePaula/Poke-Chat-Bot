@@ -4,7 +4,7 @@ def getTime():
     horario = localtime().tm_hour
 
     if(6 <= horario < 12):
-        return "dia"
+        return "bom dia"
     if(12 <= horario < 18):
-        return "tarde"
-    return "noite"
+        return "boa tarde"
+    return "boa noite"

@@ -1,21 +1,23 @@
 package wellz.Domain;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class ChatBot {
     private final List<Pokemon> pokemons = List.of(
 //          new Pokemon("", new String[]{"", ""}, new String[]{"", ""}, ""),
-            new Pokemon("Charmander", new String[]{"Fogo", "Água"}, new String[]{"Água", "Terra", "Pedra"}, "A chama que possui na ponta de seu rabo mostra a força de sua vida. Se ele estiver fraco, a chama irá diminuir. Quando está saudável, a chama brilhará intensamente. Tem preferência por coisas quentes. Quando chove, diz-se que o vapor jorra da ponta da cauda. Sua vida acabaria se essa chama se apagasse."),
+            new Pokemon("Bulbasaur", new String[]{"Planta", "Veneno"}, new String[]{"Voador", "Fogo", "Gelo", "Psíquico"}, "Desde o dia em que nasceu possui uma semente estranha plantada em suas costas. O bulbo em suas costas está cheio de nutrientes. Nele, Bulbasaur armazena suas energias. O bulbo vai crescendo à medida que envelhece porque ele absorve os raios de sol."),
+            new Pokemon("Charmander", new String[]{"Fogo"}, new String[]{"Água", "Terra", "Pedra"}, "A chama que possui na ponta de seu rabo mostra a força de sua vida. Se ele estiver fraco, a chama irá diminuir. Quando está saudável, a chama brilhará intensamente. Tem preferência por coisas quentes. Quando chove, diz-se que o vapor jorra da ponta da cauda. Sua vida acabaria se essa chama se apagasse."),
             new Pokemon("Charmeleon", new String[]{"Fogo"}, new String[]{"Água", "Terra", "Pedra"}, "Gosta muito de brigas, por isso busca constantemente por adversários. Ele ataca com suas garras afiadas e usando sua cauda como chicote de fogo. Pode soltar chamas azuis quando muito animado. Quando ele balança sua cauda em chamas, ele eleva a temperatura do ar a níveis insuportavelmente altos. Nas montanhas rochosas onde vive Charmeleon, suas caudas de fogo brilham à noite como estrelas."),
             new Pokemon("Charizard", new String[]{"Fogo", "Voador"}, new String[]{"Água", "Elétrico", "Pedra"}, "Seu fogo é quente o suficiente para derreter rochas. Quando nervoso, a chama em sua cauda queimará intensamente. É orgulhoso e voa pelos céus em busca de adversários poderosos. Suas asas podem transportar este pokémon até uma altitude de 1.400 metros. Expele fogo em temperaturas muito altas.")
     );
 
     private final String[] keyWords = {
-            "pokemon",
             "tipo",
             "fraqueza",
+            "fraco",
             "descricao",
     };
 
@@ -47,8 +49,13 @@ public class ChatBot {
 
     public void respond(String question) {
         init(question);
-        ArrayList<ArrayList<String>> textKeyWords = detectKeyWords(this.questionSplitted);
-        System.out.println(textKeyWords);
+        ArrayList<ArrayList<String>> questionKeyWords = detectKeyWords(this.questionSplitted);
+        if(questionKeyWords.get(0).size() >= 2) {
+            System.out.println("Não pode ser digitado mais de um pokémon por vez");
+            return;
+        }
+        String resposta = generateResponse(questionKeyWords);
+        System.out.println(resposta);
     }
 
 //    Este método inicia o objeto para elaborar a resposta com a pergunta reinicializando a pergunta
@@ -64,23 +71,16 @@ public class ChatBot {
         keys.add(new ArrayList<>());
         keys.add(new ArrayList<>());
         Pokemon pokemon;
-        String name;
+        String pokeName;
 
         for(int i = 0; i < text.length; i++) {
-//            Verifica se está sendo digitado mais de um pokémon na pergunta
-//            if(keys.get(0).size() >= 2) {
-//                System.out.println("Você só pode digitar um pokémon por vez!");
-//                break;
-//            }
-
-
             for(int j = 0; j < pokemons.size(); j++) {
                 pokemon = pokemons.get(j);
-                name = pokemon.getName();
+                pokeName = pokemon.getName();
 
-                if(!keys.get(0).contains(name)) {
-                    if(formatText(name).equals(formatText(text[i]))) {
-                        keys.get(0).add(name);
+                if(!keys.get(0).contains(pokeName)) {
+                    if(formatText(pokeName).equals(formatText(text[i]))) {
+                        keys.get(0).add(pokeName);
                     }
                 }
 
@@ -119,30 +119,143 @@ public class ChatBot {
         return keys;
     }
 
+    private String generateResponse(ArrayList<ArrayList<String>> questionKeyWords) {
+        ArrayList<String> pokeNamesKey = questionKeyWords.get(0);
+        ArrayList<String> pokeTypesKey = questionKeyWords.get(1);
+        ArrayList<String> utilKey = questionKeyWords.get(2);
+        String response = "";
+
+        //Verifica se há alguma palavra chave
+        if(pokeNamesKey.isEmpty() && pokeTypesKey.isEmpty() && utilKey.isEmpty()) {
+            //Retorna uma mensagem de erro
+            response = messages[0][0];
+            return response;
+        }
+
+        if(!pokeNamesKey.isEmpty()) {
+            for(int i = 0; i < pokeNamesKey.size(); i++) {
+                Pokemon pokemon = pokemons.get(getPokemonIndex(pokeNamesKey.get(i)));
+                if(!response.isEmpty()) {
+                    response += "\n\n";
+                }
+                response += pokemon.getName() + ":";
+                if(!utilKey.isEmpty()) {
+                    for (int j = 0; j < utilKey.size(); j++) {
+                        if(utilKey.get(j).equals("descricao")) {
+                            response = getMessageOfDescription(response, pokemon);
+                        }
+
+                        if(utilKey.get(j).equals("fraqueza")) {
+                            response = getMessageOfWeakeness(response, pokemon);
+                        }
+
+                        if(utilKey.get(j).equals("tipo")) {
+                            response = getMessageOfType(response, pokemon);
+                        }
+                    }
+                    return response;
+                }
+            }
+
+        }
+
+        if(!pokeTypesKey.isEmpty()) {
+            if(!utilKey.isEmpty()) {
+                for(int j = 0; j < utilKey.size(); j++) {
+                    if(utilKey.get(j).equals("fraqueza") || utilKey.get(j).equals("fraco")) {
+                        response = getMessageOfWeakestPokeOnType(response, pokeTypesKey);
+                        return response;
+                    }
+                }
+            }
+        }
+        response = messages[0][0];
+        return response;
+    }
+
+    private String getMessageOfWeakestPokeOnType(String response, ArrayList<String> pokeTypesKey) {
+        ArrayList<Pokemon> compatibles = getWeakestPokeOnType(pokeTypesKey);
+        if(!response.isEmpty()) {
+            response += "\n";
+        }
+        System.out.println("Os pokémons que se enquadram nos requisitos, são:");
+        for(int i = 0; i < compatibles.size(); i++) {
+            response += compatibles.get(i).getName();
+            if(i < compatibles.size()-1) {
+                response += "\n";
+            }
+        }
+        return response;
+    }
+
+    private ArrayList<Pokemon> getWeakestPokeOnType(ArrayList<String> types) {
+        ArrayList<Pokemon> targetPokemons = new ArrayList<>();
+
+        for(int i = 0; i < pokemons.size(); i++) {
+            Pokemon pokemon = pokemons.get(i);
+            List<String> weaknesses = Arrays.stream(pokemon.getWeaknesses()).toList();
+
+            boolean compatible = false;
+            for(int j = 0; j < types.size(); j++) {
+
+                if(weaknesses.contains(types.get(j))) {
+                    compatible = true;
+                    continue;
+                }
+                compatible = false;
+                break;
+            }
+            if(compatible) {
+                targetPokemons.add(pokemon);
+            }
+        }
+
+        return targetPokemons;
+    }
+
+    private String getMessageOfType(String response, Pokemon pokemon) {
+        if(!response.isEmpty()) {
+            response += "\n";
+        }
+        response += "Este é um pokémon de tipo ";
+        for(int i = 0; i < pokemon.getType().length; i++) {
+            response += pokemon.getType()[i];
+            if(i+1 == pokemon.getType().length) {
+                break;
+            }
+            response += "/";
+        }
+        return response;
+    }
+
+    private String getMessageOfWeakeness(String response, Pokemon pokemon) {
+        if(!response.isEmpty()) {
+            response += "\n";
+        }
+        response += "É vulnerável a pokémons do tipo ";
+        for(int i = 0; i < pokemon.getWeaknesses().length; i++) {
+            response += pokemon.getWeaknesses()[i];
+            if(i+1 == pokemon.getWeaknesses().length) {
+                break;
+            }
+            response += "/";
+        }
+        return response;
+    }
+
+    private String getMessageOfDescription(String response, Pokemon pokemon) {
+        if(!response.isEmpty()) {
+            response += "\n";
+        }
+        response += pokemon.getDescription();
+
+        return response;
+    }
+
     private String toPlural(String word) {
         char plural = 's';
 
         return word + plural;
-    }
-
-    private void printPokemonAllAtributes(Pokemon pokemon) {
-        System.out.print("O " + pokemon.getName() + " é um pokemon tipo ");
-        for(int i = 0; i < pokemon.getType().length; i++) {
-            System.out.print(pokemon.getType()[i]);
-            if(i+1 == pokemon.getType().length) {
-                break;
-            }
-            System.out.print("/");
-        }
-        System.out.print(" e é fraco contra pokemons tipo ");
-        for(int i = 0; i < pokemon.getWeaknesses().length; i++) {
-            System.out.print(pokemon.getWeaknesses()[i]);
-            if(i+1 == pokemon.getWeaknesses().length) {
-                break;
-            }
-            System.out.print("/");
-        }
-        System.out.print(".");
     }
 
     private int getPokemonIndex(String name) {
@@ -164,5 +277,33 @@ public class ChatBot {
 
     public String[][] getMessages() {
         return messages;
+    }
+
+    public List<Pokemon> getPokemons() {
+        return pokemons;
+    }
+
+    public String[] getKeyWords() {
+        return keyWords;
+    }
+
+    public String[] getPokeTypes() {
+        return pokeTypes;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public String[] getQuestionSplitted() {
+        return questionSplitted;
+    }
+
+    public void setQuestionSplitted(String[] questionSplitted) {
+        this.questionSplitted = questionSplitted;
     }
 }

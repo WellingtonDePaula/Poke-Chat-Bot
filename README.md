@@ -6,7 +6,7 @@ Para poder rodar o código, basta baixar este repositório, e então dar run na 
 
 ## Geral
 
-### Este é um projeto de alunos do IFC campus Blumenau, com o objetivo de criar um chatbot de um determinado assunto.
+### Este é um projeto de alunos do IFC campus Blumenau na disciplina de WebDesign, com o objetivo de criar um chatbot de um determinado assunto.
 
 ##### Alunos:
 - Ana

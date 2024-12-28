@@ -195,6 +195,11 @@ public class ChatBot {
     private String question;
     private String[] questionSplitted;
 
+    public void run() {
+        Utils.initMessage();
+        Utils.loopResponse(this);
+    }
+
     public void respond(String question) {
         init(question);
         ArrayList<ArrayList<String>> questionKeyWords = detectKeyWords(this.questionSplitted);
@@ -276,7 +281,7 @@ public class ChatBot {
         //Verifica se há alguma palavra chave
         if (pokeNamesKey.isEmpty() && pokeTypesKey.isEmpty() && utilKey.isEmpty()) {
             //Retorna uma mensagem de erro
-            response = messages[0];
+            response = Utils.chooseMessage(messages);
             return response;
         }
 
@@ -323,7 +328,7 @@ public class ChatBot {
                 }
             }
         }
-        response = messages[0];
+        response = Utils.chooseMessage(messages);
         return response;
     }
 

@@ -27,6 +27,17 @@ Exemplo de palavras chave:
 
 O chatbot não consegue funcionar se colocar mais de um pokémon por vez, por isso ele retornará uma mensagem de erro.
 
+## Ideias futuras
+
+- Implementar a possibilidade de um "sobre" de cada tipo de pokémon
+- Deixar o código melhor e mais "limpo"
+- Implementar a possibilidade do chat se lembrar do último pokémon citado
+- Possibilitar a entrada de mais de um pokémon por vez, fazendo uma leitura mais detalhada e avançada da entrada
+- Trazer mensagens diversificadas
+### Opcionais
+- Aplicar os conceitos de rest e restful, reestruturando todo o código
+- Consumir da [PokéApi](https://pokeapi.co), assim tendo acesso a todos os pokémons disponíveis
+
 ## Possíveis inputs
 
 Caso seja informado o nome do pokémon, poderá ser pedido até 3 informações sobre o mesmo sendo elas:

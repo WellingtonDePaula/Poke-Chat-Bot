@@ -6,14 +6,6 @@ public class Pokemon {
     private String[] weaknesses;
     private String description;
 
-    public Pokemon(String name, String[] type, String[] weaknesses, String description) {
-        this.name = name;
-        this.type = type;
-        this.weaknesses = weaknesses;
-        this.description = description;
-    }
-
-
     public String getName() {
         return name;
     }

@@ -1,6 +1,12 @@
 package wellz.Domain;
 
-import java.util.Scanner;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
@@ -16,20 +22,18 @@ public class Utils {
                 .nextInt(min, max + 1);
     }
 
-    public static void initMessage() {
-        System.out.println("--------------------------------------------------------------------------------------");
-        System.out.println("--- Seja bem-vindo ao chatbot de pokémon mais incrível do planeta, aproveite bem!! ---");
-        System.out.println("--- Gostaria de ressaltar, que o chat não funcionará caso tente colocar mais de um ---");
-        System.out.println("---                                Pokémon por vez!                                ---");
-        System.out.println("--------------------------------------------------------------------------------------");
-    }
+    public static List<Pokemon> getPokemonsFromJson() {
+        ObjectMapper conversor = new ObjectMapper();
 
-    public static void loopResponse(ChatBot cb) {
-        Scanner sc = new Scanner(System.in);
-        while(true) {
-            System.out.print("--> ");
-            String input = sc.nextLine();
-            cb.respond(input);
+        Path jsonTarget = Paths.get("src/main/resources/pokemons.json");
+
+        List<Pokemon> pokemons = null;
+        try {
+            pokemons = conversor.readValue(jsonTarget.toFile(), new TypeReference<List<Pokemon>>(){});
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+        return pokemons;
     }
 }

@@ -2,7 +2,11 @@
 
 ## Para rodar
 
-Para poder rodar o código, basta baixar este repositório, e então dar run na classe Main, e deliciar-se desse projeto lixo. bjs
+Este é um projeto maven, portanto para poder rodar o código deverá ter o maven baixado e configurado. Então basta baixar este repositório, abrir o console no projeto e rodar o seguinte comando:
+
+- ***mvn install clean***
+
+Após isso então, dar run na classe Main, e deliciar-se desse projeto lixo. bjs
 
 ## Geral
 

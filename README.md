@@ -44,6 +44,7 @@ Caso seja informado o nome do pokémon, poderá ser pedido até 3 informações 
 1. Tipos
 2. Fraquezas
 3. Descrição
+
 Podendo ser pedidas as três ao mesmo tempo ou não.
 
 ### 🔴Exemplo:

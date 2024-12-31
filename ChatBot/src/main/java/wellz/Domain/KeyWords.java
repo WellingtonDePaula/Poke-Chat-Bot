@@ -7,6 +7,7 @@ public enum KeyWords {
     DESCRICAO("descricao");
 
     public final String VALUE;
+
     KeyWords(String value) {
         this.VALUE = value;
     }

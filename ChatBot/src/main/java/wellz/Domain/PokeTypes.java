@@ -25,6 +25,4 @@ public enum PokeTypes {
     PokeTypes(String value) {
         this.VALUE = value;
     }
-
-
 }

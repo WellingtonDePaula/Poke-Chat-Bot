@@ -3,16 +3,29 @@ package wellz.Domain;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.text.Normalizer;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
     public static String chooseMessage(String[] messages) {
         int len = messages.length;
-        int indexTarget = getRandInt(0, len-1);
+        int indexTarget = getRandInt(0, len - 1);
         return messages[indexTarget];
+    }
+
+    public static String formatText(String string) {
+        String normalized = Normalizer.normalize(string, Normalizer.Form.NFD);
+        String withoutAccents = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String withoutPunctuation = withoutAccents.replaceAll("\\p{Punct}", "");
+
+        return withoutPunctuation.toLowerCase();
+    }
+
+    public static String toPlural(String word) {
+        char plural = 's';
+
+        return word + plural;
     }
 
     public static int getRandInt(int min, int max) {

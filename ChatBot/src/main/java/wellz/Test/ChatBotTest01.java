@@ -14,7 +14,7 @@ public class ChatBotTest01 {
         System.out.println("--- Gostaria de ressaltar, que o chat não funcionará caso tente colocar mais de um ---");
         System.out.println("---                                Pokémon por vez!                                ---");
         System.out.println("--------------------------------------------------------------------------------------");
-        while(true) {
+        while (true) {
             System.out.print("--> ");
             String input = sc.nextLine();
             chat.respond(input);

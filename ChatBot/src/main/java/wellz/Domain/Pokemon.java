@@ -1,10 +1,21 @@
 package wellz.Domain;
 
+import static wellz.Domain.Utils.formatText;
+
 public class Pokemon {
     private String name;
     private String[] type;
     private String[] weaknesses;
     private String description;
+
+    public static int getPokemonIndex(String name) {
+        for (int i = 0; i < Pokemons.POKEMONS.VALUE.size(); i++) {
+            if (formatText(name).equals(formatText(Pokemons.POKEMONS.VALUE.get(i).getName()))) {
+                return i;
+            }
+        }
+        return 0;
+    }
 
     public String getName() {
         return name;

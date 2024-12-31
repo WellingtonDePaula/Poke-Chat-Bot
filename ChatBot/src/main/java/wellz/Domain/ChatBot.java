@@ -2,22 +2,25 @@ package wellz.Domain;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import static wellz.Domain.Utils.*;
+
 public class ChatBot {
-    private final List<Pokemon> pokemons = Utils.loadFromJson("pokemons.json", new TypeReference<List<Pokemon>>(){});
-    private final String[] messages = Utils.loadFromJson("messages.json", new TypeReference<String[]>(){});
+    private final String[] messages = loadFromJson("messages.json", new TypeReference<String[]>() {
+    });
 
     private String question;
     private String[] questionSplitted;
 
+    // Método de inicialização do chatbot
     public void run() {
         initMessage();
-        loopResponse(this);
+        loopResponse();
+        stopMessage();
     }
 
     private void initMessage() {
@@ -27,86 +30,107 @@ public class ChatBot {
         System.out.println("---              Pokémon por vez! Digite 'sair' para parar o programa              ---");
         System.out.println("--------------------------------------------------------------------------------------");
     }
+
     private void stopMessage() {
-        System.out.println("                     |------------------------------------------|                     ");
-        System.out.println("--------------------|                                            |--------------------");
+        System.out.println("|--                  |------------------------------------------|                  --|");
+        System.out.println("|  |----------------|                                            |----------------|  |");
         System.out.println("|                    Finalizando programa, obrigado por testá-lo!                    |");
-        System.out.println("--------------------|                                            |--------------------");
-        System.out.println("                     |------------------------------------------|                     ");
+        System.out.println("|  |----------------|                                            |----------------|  |");
+        System.out.println("|--                  |------------------------------------------|                  --|");
     }
 
-    private void loopResponse(ChatBot cb) {
+    // Método que fica esperando uma pergunta do usuário, até ele decidir sair do sistema
+    private void loopResponse() {
         Scanner sc = new Scanner(System.in);
-        while(true) {
+        // Começa o loop
+        while (true) {
             System.out.print("--> ");
+            // Pede o input
             String input = sc.nextLine();
-            if(formatText(input).equals("sair")) {
-                stopMessage();
+            // Verifica se o usuário deseja sair, e caso true, para o while loop
+            if (formatText(input).equals("sair")) {
                 break;
             }
-
-            cb.respond(input);
+            // Chama o método de geração da resposta
+            respond(input);
         }
     }
 
+    // Método que gera a resposta
     public void respond(String question) {
-        init(question);
-        ArrayList<ArrayList<String>> questionKeyWords = detectKeyWords(this.questionSplitted);
+        // Cria um array list das palavras chaves detectadas na pergunta
+        ArrayList<ArrayList<String>> questionKeyWords;
+        // Cria uma string, onde será trabalhada a resposta para o usuário
+        String resposta;
+        // Transformando a pergunta em um array de cada palavra da pergunta
+        this.questionSplitted = splitQuestion(question);
+
+        // Chama o método que detecta palavras chaves no array passado como parâmetro
+        questionKeyWords = detectKeyWords(this.questionSplitted);
+
+        // Detecta se foi digitado mais de um pokémon, caso true ele retorna e para a geração da resposta
         if (questionKeyWords.get(0).size() >= 2) {
             System.out.println("Não pode ser digitado mais de um pokémon por vez");
             return;
         }
-        String resposta = generateResponse(questionKeyWords);
+
+        // Chama o método que gera a resposta com base nas palavras chaves encontradas no texto
+        resposta = generateResponse(questionKeyWords);
         System.out.println(resposta);
     }
 
-    //    Este método inicia o objeto para elaborar a resposta com a pergunta reinicializando a pergunta
-    private void init(String question) {
+    // Este método inicia o objeto para elaborar a resposta com a pergunta reinicializando a pergunta
+    private String[] splitQuestion(String question) {
         this.question = question;
-//        Formata a pergunta tirando pontuações e deixando em caixa baixa
-        this.questionSplitted = formatText(question).split("\\W+");
+        // Formata a pergunta tirando pontuações e deixando em caixa baixa
+        return formatText(question).split("\\W+");
     }
 
     private ArrayList<ArrayList<String>> detectKeyWords(String[] text) {
+        // Cria um array das 'chaves' que podem ter
         ArrayList<ArrayList<String>> keys = new ArrayList<>();
         keys.add(new ArrayList<>());
         keys.add(new ArrayList<>());
         keys.add(new ArrayList<>());
-        Pokemon pokemon;
+
+        // String do nome do pokémon que pode ser detectado nas palavras chaves
         String pokeName;
 
-        for (int i = 0; i < text.length; i++) {
-            for (int j = 0; j < pokemons.size(); j++) {
-                pokemon = pokemons.get(j);
+        // Esse loop percorre toda a pergunta
+        for (String string : text) {
+            // Esse loop percorre todo o array de pokemons
+            for (Pokemon pokemon : Pokemons.POKEMONS.VALUE) {
+                // Armazena o nome do pokémon da iteração atual na variavel pokeName
                 pokeName = pokemon.getName();
 
+                // Verifica o array de palavras chaves para saber se ele já contém o nome do pokémon da iteração atual
                 if (!keys.get(0).contains(pokeName)) {
-                    if (formatText(pokeName).equals(formatText(text[i]))) {
+                    // Verifica se o nome do pokémon da iteração atual se iguala à palavra atual da pergunta
+                    if (formatText(pokeName).equals(formatText(string))) {
+                        // Adiciona o nome do pokémon nas palavras chaves
                         keys.get(0).add(pokeName);
                     }
                 }
 
-//                Faz a verificação e adiciona os tipos de pokémons presentes na pergunta do usuário
-                for(PokeTypes pokeTypes : PokeTypes.values()) {
+                // Faz a verificação e adiciona os tipos de pokémons presentes na pergunta do usuário
+                for (PokeTypes pokeTypes : PokeTypes.values()) {
                     if (!keys.get(1).contains(pokeTypes.VALUE)) {
-//                        Verifica se o tipo de pokémon é igual à palavra atual da pergunta do usuário
-                        if (formatText(pokeTypes.VALUE).equals(formatText(text[i]))) {
-//                            Adiciona o tipo para o arraylist keys
+                        // Verifica se o tipo de pokémon é igual à palavra atual da pergunta do usuário
+                        if (formatText(pokeTypes.VALUE).equals(formatText(string))) {
+                            // Adiciona o tipo para o arraylist keys
                             keys.get(1).add(pokeTypes.VALUE);
                         }
                     }
                 }
-                ////////////////////////////////////////////////////////////////////////////////////
             }
 
-//            Esse for faz a verificação de palavras chaves como, 'fraqueza' no texto(pergunta) percorrido
-
-//            Percorre todo os array de palavras chaves
-            for(KeyWords keyWords : KeyWords.values()) {
-//                Verifica se a palavra chave já esta no array chave(keys), e caso não esteja,
-//                verifica se pertence às palavras chaves e a adiciona ao array chave(keys)
+            // Esse for faz a verificação de palavras chaves como, 'fraqueza' no texto (pergunta) percorrido
+            // Percorre todo o array de palavras chaves
+            for (KeyWords keyWords : KeyWords.values()) {
+                // Verifica se a palavra chave já esta no array chave (keys), e caso não esteja,
+                // verifica se pertence às palavras chaves e a adiciona ao array chave (keys)
                 if (!keys.get(2).contains(keyWords.VALUE)) {
-                    if (formatText(text[i]).equals(keyWords.VALUE) || formatText(text[i]).equals(toPlural(keyWords.VALUE))) {
+                    if (formatText(string).equals(keyWords.VALUE) || formatText(string).equals(toPlural(keyWords.VALUE))) {
                         keys.get(2).add(keyWords.VALUE);
                     }
                 }
@@ -121,31 +145,31 @@ public class ChatBot {
         ArrayList<String> utilKey = questionKeyWords.get(2);
         String response = "";
 
-        //Verifica se há alguma palavra chave
+        // Verifica se há alguma palavra chave, caso nao haja ele executa o bloco
         if (pokeNamesKey.isEmpty() && pokeTypesKey.isEmpty() && utilKey.isEmpty()) {
-            //Retorna uma mensagem de erro
-            response = Utils.chooseMessage(messages);
+            // Retorna uma mensagem de erro
+            response = chooseMessage(messages);
             return response;
         }
 
         if (!pokeNamesKey.isEmpty()) {
-            for (int i = 0; i < pokeNamesKey.size(); i++) {
-                Pokemon pokemon = pokemons.get(getPokemonIndex(pokeNamesKey.get(i)));
+            for (String name : pokeNamesKey) {
+                Pokemon pokemon = Pokemons.POKEMONS.VALUE.get(Pokemon.getPokemonIndex(name));
                 if (!response.isEmpty()) {
                     response += "\n\n";
                 }
                 response += pokemon.getName() + ":";
                 if (!utilKey.isEmpty()) {
-                    for (int j = 0; j < utilKey.size(); j++) {
-                        if (utilKey.get(j).equals("descricao")) {
+                    for (String string : utilKey) {
+                        if (string.equals("descricao")) {
                             response = getMessageOfDescription(response, pokemon);
                         }
 
-                        if (utilKey.get(j).equals("fraqueza")) {
+                        if (string.equals("fraqueza")) {
                             response = getMessageOfWeakeness(response, pokemon);
                         }
 
-                        if (utilKey.get(j).equals("tipo")) {
+                        if (string.equals("tipo")) {
                             response = getMessageOfType(response, pokemon);
                         }
                     }
@@ -157,13 +181,13 @@ public class ChatBot {
 
         if (!pokeTypesKey.isEmpty()) {
             if (!utilKey.isEmpty()) {
-                for (int j = 0; j < utilKey.size(); j++) {
-                    if (utilKey.get(j).equals("fraqueza") || utilKey.get(j).equals("fraco")) {
+                for (String string : utilKey) {
+                    if (string.equals("fraqueza") || string.equals("fraco")) {
                         ArrayList<Pokemon> compatibles = getPoke(pokeTypesKey, "weakness");
                         response = generateMessage(response, compatibles);
                         return response;
                     }
-                    if (utilKey.get(j).equals("tipo")) {
+                    if (string.equals("tipo")) {
                         ArrayList<Pokemon> compatibles = getPoke(pokeTypesKey, "type");
                         response = generateMessage(response, compatibles);
                         return response;
@@ -171,7 +195,7 @@ public class ChatBot {
                 }
             }
         }
-        response = Utils.chooseMessage(messages);
+        response = chooseMessage(messages);
         return response;
     }
 
@@ -192,8 +216,8 @@ public class ChatBot {
     private ArrayList<Pokemon> getPoke(ArrayList<String> keys, String characteristic) {
         ArrayList<Pokemon> targetPokemons = new ArrayList<>();
 
-        for (int i = 0; i < pokemons.size(); i++) {
-            Pokemon pokemon = pokemons.get(i);
+        for (int i = 0; i < Pokemons.POKEMONS.VALUE.size(); i++) {
+            Pokemon pokemon = Pokemons.POKEMONS.VALUE.get(i);
             List<String> key;
             switch (characteristic) {
                 case "type":
@@ -203,14 +227,14 @@ public class ChatBot {
                     key = Arrays.stream(pokemon.getWeaknesses()).toList();
                     break;
                 default:
-                    key = Arrays.stream(pokemon.getType()).toList();
+                    key = null;
                     break;
             }
 
             boolean compatible = false;
-            for (int j = 0; j < keys.size(); j++) {
+            for (String string : keys) {
 
-                if (key.contains(keys.get(j))) {
+                if (key.contains(string)) {
                     compatible = true;
                     continue;
                 }
@@ -264,35 +288,8 @@ public class ChatBot {
         return response;
     }
 
-    private String toPlural(String word) {
-        char plural = 's';
-
-        return word + plural;
-    }
-
-    private int getPokemonIndex(String name) {
-        for (int i = 0; i < pokemons.size(); i++) {
-            if (formatText(name).equals(formatText(pokemons.get(i).getName()))) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    private String formatText(String string) {
-        String normalized = Normalizer.normalize(string, Normalizer.Form.NFD);
-        String withoutAccents = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-        String withoutPunctuation = withoutAccents.replaceAll("\\p{Punct}", "");
-
-        return withoutPunctuation.toLowerCase();
-    }
-
     public String[] getMessages() {
         return messages;
-    }
-
-    public List<Pokemon> getPokemons() {
-        return pokemons;
     }
 
     public String getQuestion() {

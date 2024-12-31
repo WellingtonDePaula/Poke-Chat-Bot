@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,18 +21,21 @@ public class Utils {
                 .nextInt(min, max + 1);
     }
 
-    public static List<Pokemon> getPokemonsFromJson() {
-        ObjectMapper conversor = new ObjectMapper();
 
-        Path jsonTarget = Paths.get("src/main/resources/pokemons.json");
+    public static <T> T loadFromJson(String resourcePath, TypeReference<T> typeReference) {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        List<Pokemon> pokemons = null;
-        try {
-            pokemons = conversor.readValue(jsonTarget.toFile(), new TypeReference<List<Pokemon>>(){});
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        // Usando ClassLoader para localizar o arquivo no diretório resources
+        InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream(resourcePath);
+
+        if (inputStream == null) {
+            throw new RuntimeException("Arquivo " + resourcePath + " não encontrado em resources.");
         }
 
-        return pokemons;
+        try {
+            return objectMapper.readValue(inputStream, typeReference);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao carregar o arquivo JSON: " + resourcePath, e);
+        }
     }
 }

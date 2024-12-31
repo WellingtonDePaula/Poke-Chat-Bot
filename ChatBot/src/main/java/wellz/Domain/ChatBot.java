@@ -1,61 +1,19 @@
 package wellz.Domain;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-
 public class ChatBot {
-    private final List<Pokemon> pokemons = Utils.getPokemonsFromJson();
+    private final List<Pokemon> pokemons = Utils.loadFromJson("pokemons.json", new TypeReference<List<Pokemon>>(){});
+    private final String[] messages = Utils.loadFromJson("messages.json", new TypeReference<String[]>(){});
 
-    private final String[] keyWords = {
-            "tipo",
-            "fraqueza",
-            "fraco",
-            "descricao",
-    };
-
-    private final String[] pokeTypes = {
-            "Normal",
-            "Fogo",
-            "Água",
-            "Planta",
-            "Elétrico",
-            "Gelo",
-            "Lutador",
-            "Veneno",
-            "Terra",
-            "Voador",
-            "Psíquico",
-            "Inseto",
-            "Pedra",
-            "Fantasma",
-            "Dragão",
-            "Noturno",
-            "Metálico",
-            "Fada"
-    };
-
-    private final String[] messages = {
-            "Não entendi, você poderia reformular sua frase?",
-            "Não consegui entender sua solicitação. Tente reformular.",
-            "Desculpe, não consegui interpretar sua frase. Pode tentar novamente?",
-            "Mensagem inválida. Por favor, tente novamente.",
-            "Erro na interpretação. Reformule sua pergunta, por favor.",
-            "Não entendi. Poderia explicar de outra forma?",
-            "Sua solicitação não foi compreendida. Tente reformular.",
-            "Não consegui processar isso. Pode tentar novamente?",
-            "Algo deu errado. Reformule sua frase, por favor.",
-            "Não foi possível entender. Poderia explicar de outra maneira?",
-            "Desculpe, mas não consegui interpretar. Tente novamente.",
-            "Erro na comunicação. Por favor, tente reformular.",
-            "Mensagem não reconhecida. Reformule, por favor.",
-            "Solicitação inválida. Tente novamente.",
-            "Não entendi o que você quis dizer. Pode explicar melhor?",
-            "Desculpe, mas isso não faz sentido para mim. Tente novamente."
-    };
+    private final String[] keyWords = KeyWords.getValues();
+    private final String[] pokeTypes = PokeTypes.getValues();
 
     private String question;
     private String[] questionSplitted;

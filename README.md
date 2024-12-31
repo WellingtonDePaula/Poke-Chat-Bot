@@ -4,8 +4,6 @@
 
 Este é um projeto maven, portanto para poder rodar o código deverá ter o maven baixado e configurado. Então basta baixar este repositório, abrir o console no projeto e rodar o seguinte comando:
 
-- ***mvn install clean***
-
 ![image](https://github.com/user-attachments/assets/382d775b-3ba2-4c9d-be69-f9b67685247b)
 
 Caso ocorra tudo certo, você deverá receber esta mensagem

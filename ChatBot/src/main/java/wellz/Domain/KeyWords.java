@@ -6,18 +6,9 @@ public enum KeyWords {
     FRACO("fraco"),
     DESCRICAO("descricao");
 
-    private final String value;
+    public final String VALUE;
     KeyWords(String value) {
-        this.value = value;
+        this.VALUE = value;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public static String[] getValues() {
-        return java.util.Arrays.stream(KeyWords.values())
-                .map(KeyWords::getValue)
-                .toArray(String[]::new);
-    }
 }

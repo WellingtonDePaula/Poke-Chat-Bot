@@ -20,20 +20,11 @@ public enum PokeTypes {
     METALICO("Metálico"),
     FADA("Fada");
 
-    private final String value;
+    public final String VALUE;
 
     PokeTypes(String value) {
-        this.value = value;
+        this.VALUE = value;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public static String[] getValues() {
-        return java.util.Arrays.stream(PokeTypes.values())
-                .map(PokeTypes::getValue)
-                .toArray(String[]::new);
-    }
 
 }

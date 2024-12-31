@@ -12,9 +12,6 @@ public class ChatBot {
     private final List<Pokemon> pokemons = Utils.loadFromJson("pokemons.json", new TypeReference<List<Pokemon>>(){});
     private final String[] messages = Utils.loadFromJson("messages.json", new TypeReference<String[]>(){});
 
-    private final String[] keyWords = KeyWords.getValues();
-    private final String[] pokeTypes = PokeTypes.getValues();
-
     private String question;
     private String[] questionSplitted;
 
@@ -90,33 +87,27 @@ public class ChatBot {
                 }
 
 //                Faz a verificação e adiciona os tipos de pokémons presentes na pergunta do usuário
-
-//                Esse for percorre todo o array dos tipos de pokémons
-                for (int k = 0; k < pokeTypes.length; k++) {
-//                    Verifica se o arraylist keys ja possuí o tipo que está sendo verificado agora, para evitar repetições
-                    if (!keys.get(1).contains(pokeTypes[k])) {
-//                        Verifica se o tipo de pokémon é igual a palavra atual da pergunta do usuário
-                        if (formatText(pokeTypes[k]).equals(formatText(text[i]))) {
+                for(PokeTypes pokeTypes : PokeTypes.values()) {
+                    if (!keys.get(1).contains(pokeTypes.VALUE)) {
+//                        Verifica se o tipo de pokémon é igual à palavra atual da pergunta do usuário
+                        if (formatText(pokeTypes.VALUE).equals(formatText(text[i]))) {
 //                            Adiciona o tipo para o arraylist keys
-                            keys.get(1).add(pokeTypes[k]);
+                            keys.get(1).add(pokeTypes.VALUE);
                         }
                     }
                 }
-
                 ////////////////////////////////////////////////////////////////////////////////////
             }
 
 //            Esse for faz a verificação de palavras chaves como, 'fraqueza' no texto(pergunta) percorrido
 
 //            Percorre todo os array de palavras chaves
-            for (int j = 0; j < this.keyWords.length; j++) {
-                /*
-                Verficia se a palavra chave já esta no array chave(keys), e caso não esteja,
-                verifica se pertence ás palavras chaves e a adiciona ao array chave(keys)
-                */
-                if (!keys.get(2).contains(this.keyWords[j])) {
-                    if (formatText(text[i]).equals(keyWords[j]) || formatText(text[i]).equals(toPlural(keyWords[j]))) {
-                        keys.get(2).add(keyWords[j]);
+            for(KeyWords keyWords : KeyWords.values()) {
+//                Verifica se a palavra chave já esta no array chave(keys), e caso não esteja,
+//                verifica se pertence às palavras chaves e a adiciona ao array chave(keys)
+                if (!keys.get(2).contains(keyWords.VALUE)) {
+                    if (formatText(text[i]).equals(keyWords.VALUE) || formatText(text[i]).equals(toPlural(keyWords.VALUE))) {
+                        keys.get(2).add(keyWords.VALUE);
                     }
                 }
             }
@@ -302,14 +293,6 @@ public class ChatBot {
 
     public List<Pokemon> getPokemons() {
         return pokemons;
-    }
-
-    public String[] getKeyWords() {
-        return keyWords;
-    }
-
-    public String[] getPokeTypes() {
-        return pokeTypes;
     }
 
     public String getQuestion() {

@@ -6,6 +6,16 @@ Este é um projeto maven, portanto para poder rodar o código deverá ter o mave
 
 - ***mvn install clean***
 
+![image](https://github.com/user-attachments/assets/382d775b-3ba2-4c9d-be69-f9b67685247b)
+
+Caso ocorra tudo certo, você deverá receber esta mensagem
+
+![image](https://github.com/user-attachments/assets/140ad67d-2d2d-4e2b-b702-efeb830c25e6)
+
+#### 🔴Atenção
+
+Abra o console na pasta do projeto java, não do projeto todo em si.
+
 Após isso então, dar run na classe Main, e deliciar-se desse projeto lixo. bjs
 
 ## Geral
